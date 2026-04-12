@@ -1,5 +1,7 @@
 #include <shared/stdafx.hpp>
 
+#include <shared/safe_handle.hpp>
+
 #include <dbghelp.h>
 
 #pragma comment( lib, "dbghelp.lib" )
@@ -7,7 +9,7 @@
 
 #define DLL_EXPORT extern "C" __declspec(dllexport)
 
-HANDLE MonitorThread = nullptr;
+SafeHandle MonitorThread;
 
 static DWORD WINAPI MonitorThreadProc( LPVOID ) {
   std::printf( "Running Monitor Thread" );
@@ -29,7 +31,7 @@ DLL_EXPORT void StartFaultline() {
   SymSetOptions( SYMOPT_UNDNAME | SYMOPT_DEFERRED_LOADS );
   SymInitialize( GetCurrentProcess(), nullptr, TRUE );
 
-  MonitorThread = CreateThread( nullptr, 0, MonitorThreadProc, nullptr, 0, nullptr );
+  MonitorThread.Handle = CreateThread( nullptr, 0, MonitorThreadProc, nullptr, 0, nullptr );
 
   if ( !MonitorThread ) {
     std::printf( "Failed to create monitor thread: %lu", GetLastError() );
@@ -39,8 +41,6 @@ DLL_EXPORT void StartFaultline() {
 DLL_EXPORT void StopFaultline() {
   if ( MonitorThread ) {
     WaitForSingleObject( MonitorThread, 2000 );
-    CloseHandle( MonitorThread );
-    MonitorThread = nullptr;
   }
 
   SymCleanup( GetCurrentProcess() );
