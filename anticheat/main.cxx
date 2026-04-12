@@ -3,10 +3,10 @@
 
 static Faultline Instance;
 
-DLL_EXPORT void StartFaultline() {
+ANTICHEAT_API void StartFaultline() {
   Instance.Start();
 }
 
-DLL_EXPORT void StopFaultline() {
+ANTICHEAT_API void StopFaultline() {
   Instance.Stop();
 }
