@@ -5,10 +5,12 @@
 
 #include <windows.h>
 
-#include "defines.hxx"
-
-#include <print>
-#include <thread>
 #include <iostream>
+#include <print>
 #include <string>
+#include <thread>
 #include <vector>
+
+#include "defines.hxx"
+#include "logger.hxx"
+#include "safe_handle.hxx"

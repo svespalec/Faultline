@@ -1,5 +1,6 @@
 add_library( anticheat SHARED
   main.cxx
+  faultline.cxx
   stack_walk.cxx
 )
 

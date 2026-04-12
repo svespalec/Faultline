@@ -7,7 +7,7 @@
 
 struct StackFrame {
   std::uintptr_t Pc{};
-  bool InValidModule{};
+  bool KnownModule{};
   std::string ModuleName{};
 };
 

@@ -1,5 +1,4 @@
 #include "stack_walk.hxx"
-#include <shared/safe_handle.hxx>
 #include <shared/utils.hxx>
 
 constexpr std::size_t MaxFrames = 64;
@@ -17,6 +16,7 @@ std::vector<StackFrame> CaptureStack( std::uintptr_t ThreadId ) {
   SafeHandle Thread( OpenThread( Access, FALSE, static_cast<DWORD>( ThreadId ) ) );
 
   if ( !Thread ) {
+    LOG_ERROR( "Failed to open thread {}", ThreadId );
     return Frames;
   }
 
@@ -24,6 +24,7 @@ std::vector<StackFrame> CaptureStack( std::uintptr_t ThreadId ) {
   // Freeze the thread so we can safely read its context.
   //
   if ( SuspendThread( Thread ) == static_cast<DWORD>( -1 ) ) {
+    LOG_ERROR( "Failed to suspend thread {}", ThreadId );
     return Frames;
   }
 
@@ -31,6 +32,7 @@ std::vector<StackFrame> CaptureStack( std::uintptr_t ThreadId ) {
   Ctx.ContextFlags = CONTEXT_FULL;
 
   if ( !GetThreadContext( Thread, &Ctx ) ) {
+    LOG_ERROR( "Failed to get context for thread {}", ThreadId );
     ResumeThread( Thread );
     return Frames;
   }
@@ -74,7 +76,7 @@ std::vector<StackFrame> CaptureStack( std::uintptr_t ThreadId ) {
 
     Frames.push_back( {
       .Pc            = Pc,
-      .InValidModule = false,
+      .KnownModule = false,
       .ModuleName    = ModuleNameFromAddress( Pc ),
     } );
   }
