@@ -1,5 +1,6 @@
 add_library( anticheat SHARED
   main.cpp
+  stack_walk.cpp
 )
 
 target_link_libraries( anticheat PRIVATE shared )

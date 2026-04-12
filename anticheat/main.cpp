@@ -1,11 +1,6 @@
 #include <shared/stdafx.hpp>
-
 #include <shared/safe_handle.hpp>
-
-#include <dbghelp.h>
-
-#pragma comment( lib, "dbghelp.lib" )
-#pragma comment( lib, "psapi.lib" )
+#include "stack_walk.hpp"
 
 #define DLL_EXPORT extern "C" __declspec(dllexport)
 
