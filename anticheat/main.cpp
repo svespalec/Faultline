@@ -1,8 +1,9 @@
-#include <iostream>
-#include <windows.h>
+#include <shared/stdafx.hpp>
+
 #include <dbghelp.h>
 
-#pragma comment(lib, "dbghelp.lib")
+#pragma comment( lib, "dbghelp.lib" )
+#pragma comment( lib, "psapi.lib" )
 
 #define DLL_EXPORT extern "C" __declspec(dllexport)
 
@@ -33,11 +34,4 @@ DLL_EXPORT void StartFaultLine() {
   if ( !MonitorThread ) {
     std::printf( "Failed to create monitor thread: %lu", GetLastError() );
   }
-}
-
-int main() {
-  StartFaultLine();
-  WaitForSingleObject( MonitorThread, INFINITE );
-
-  return 0;
 }

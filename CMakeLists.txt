@@ -4,4 +4,6 @@ project( faultline LANGUAGES CXX )
 set( CMAKE_CXX_STANDARD 23 )
 set( CMAKE_CXX_STANDARD_REQUIRED ON )
 
-add_executable( faultline main.cpp )
+add_subdirectory( shared )
+add_subdirectory( anticheat )
+add_subdirectory( host )
