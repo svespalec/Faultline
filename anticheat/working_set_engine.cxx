@@ -131,7 +131,7 @@ void WorkingSetEngine::OnSuspiciousPc(
   const PcInfo& Info,
   std::uintptr_t Tid
 ) {
-  LOG_INFO( "----------------------- Detection ----------------------" );
+  LOG_INFO( "---------------------- Detection ----------------------" );
   LOG_ERROR( "Suspicious execution @ PC {:#018x}", Info.Pc );
   LOG_INFO( "TID: {}", Tid );
   LOG_INFO( "Region: [{:#018x} - {:#018x}]", Info.RegionBase, Info.RegionEnd );
@@ -143,7 +143,7 @@ void WorkingSetEngine::OnSuspiciousPc(
 
   if ( Frames.empty() ) {
     LOG_INFO( "Stack: failed or thread already exited" );
-    LOG_INFO( "-------------------------------------------------------" );
+    LOG_INFO( "------------------------------------------------------" );
     return;
   }
 
@@ -153,11 +153,11 @@ void WorkingSetEngine::OnSuspiciousPc(
     const auto& F = Frames[ I ];
     auto Label = F.ModuleName.empty() ? "???" : F.ModuleName;
 
-    LOG_INFO( "  [{}] {:#018x} [{}]{}",
+    LOG_INFO( " [{}] {:#018x} [{}]{}",
       I, F.Pc, Label,
       F.WithinKnownModule ? "" : " <-- OUTSIDE KNOWN MODULE"
     );
   }
 
-  LOG_INFO( "-------------------------------------------------------" );
+  LOG_INFO( "------------------------------------------------------" );
 }
