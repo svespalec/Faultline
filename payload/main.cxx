@@ -19,7 +19,7 @@ extern "C" __declspec( dllexport ) DWORD WINAPI PayloadRun( LPVOID ) {
   ) );
 
   if ( Page ) {
-    Page[0] = 0x41;
+    Page[ 0 ] = 0x41;
     VirtualFree( Page, 0, MEM_RELEASE );
   }
 

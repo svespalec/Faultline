@@ -89,15 +89,17 @@ void WorkingSetEngine::Poll() {
     auto BufBytes = static_cast<DWORD>( BufferEntries * sizeof( PSAPI_WS_WATCH_INFORMATION_EX ) );
 
     if ( GetWsChangesEx( GetCurrentProcess(), WatchBuffer, &BufBytes ) ) {
-      ProcessEntries();
+      auto Count = static_cast<std::size_t>( BufBytes ) / sizeof( PSAPI_WS_WATCH_INFORMATION_EX );
+      ProcessEntries( Count );
     }
 
     Sleep( PollIntervalMs );
   }
 }
 
-void WorkingSetEngine::ProcessEntries() {
-  for ( const auto& Entry : WatchBuffer ) {
+void WorkingSetEngine::ProcessEntries( std::size_t Count ) {
+  for ( std::size_t I = 0; I < Count; ++I ) {
+    const auto& Entry = WatchBuffer[ I ];
     auto Pc = reinterpret_cast<std::uintptr_t>( Entry.BasicInfo.FaultingPc );
     auto Va = reinterpret_cast<std::uintptr_t>( Entry.BasicInfo.FaultingVa );
 
@@ -141,7 +143,7 @@ void WorkingSetEngine::OnSuspiciousPc(
   LOG_INFO( "  Stack trace ({} frames):", Frames.size() );
 
   for ( std::size_t I = 0; I < Frames.size(); ++I ) {
-    const auto& F = Frames[I];
+    const auto& F = Frames[ I ];
     auto Label = F.ModuleName.empty() ? "???" : F.ModuleName;
 
     LOG_INFO( "    [{}] {:#018x} [{}]{}",

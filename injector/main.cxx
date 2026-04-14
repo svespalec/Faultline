@@ -126,7 +126,7 @@ static MapResult ManualMap( HANDLE Process, const char* DllPath ) {
              - static_cast<std::intptr_t>( Nt->OptionalHeader.ImageBase );
 
   if ( Delta ) {
-    auto& Dir = Nt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC];
+    auto& Dir = Nt->OptionalHeader.DataDirectory[ IMAGE_DIRECTORY_ENTRY_BASERELOC ];
 
     if ( Dir.VirtualAddress && Dir.Size ) {
       auto* Block = reinterpret_cast<IMAGE_BASE_RELOCATION*>(
@@ -142,9 +142,9 @@ static MapResult ManualMap( HANDLE Process, const char* DllPath ) {
         auto* Entries = reinterpret_cast<WORD*>( Block + 1 );
 
         for ( DWORD J = 0; J < Count; ++J ) {
-          if ( ( Entries[J] >> 12 ) == IMAGE_REL_BASED_DIR64 ) {
+          if ( ( Entries[ J ] >> 12 ) == IMAGE_REL_BASED_DIR64 ) {
             auto* Patch = reinterpret_cast<std::intptr_t*>(
-              Image.data() + Block->VirtualAddress + ( Entries[J] & 0x0FFF )
+              Image.data() + Block->VirtualAddress + ( Entries[ J ] & 0x0FFF )
             );
 
             *Patch += Delta;
@@ -162,7 +162,9 @@ static MapResult ManualMap( HANDLE Process, const char* DllPath ) {
   // Resolve imports by looking up functions in our own process.
   // System DLLs (kernel32, ntdll, etc.) are loaded at the same base
   // address across all processes in a session, so the pointers we
-  // write into the IAT are valid in the target process too (lucky for us hey?)
+  // write into the IAT are valid in the target process too.
+  // This only works for system DLLs that share a base across processes.
+  // Non-system DLLs or DLLs not loaded in the target will produce bad pointers.
   //
   auto& ImportDir = Nt->OptionalHeader.DataDirectory[ IMAGE_DIRECTORY_ENTRY_IMPORT ];
 
@@ -230,10 +232,10 @@ static MapResult ManualMap( HANDLE Process, const char* DllPath ) {
     auto* Functions = reinterpret_cast<DWORD*>( Image.data() + Exp->AddressOfFunctions );
 
     for ( DWORD I = 0; I < Exp->NumberOfNames; ++I ) {
-      auto* Sym = reinterpret_cast<char*>( Image.data() + Names[I] );
+      auto* Sym = reinterpret_cast<char*>( Image.data() + Names[ I ] );
 
       if ( std::strcmp( Sym, "PayloadRun" ) == 0 ) {
-        Result.ExportRva = Functions[Ordinals[I]];
+        Result.ExportRva = Functions[ Ordinals[ I ] ];
         LOG_INFO( "PayloadRun RVA: {:#010x}", Result.ExportRva );
         break;
       }
@@ -267,8 +269,8 @@ static MapResult ManualMap( HANDLE Process, const char* DllPath ) {
 }
 
 int main( int Argc, char** Argv ) {
-  const char* TargetName = Argc > 1 ? Argv[1] : "host.exe";
-  const char* PayloadPath = Argc > 2 ? Argv[2] : "payload.dll";
+  const char* TargetName = Argc > 1 ? Argv[ 1 ] : "host.exe";
+  const char* PayloadPath = Argc > 2 ? Argv[ 2 ] : "payload.dll";
 
   LOG_STEP( "Looking for {}", TargetName );
 

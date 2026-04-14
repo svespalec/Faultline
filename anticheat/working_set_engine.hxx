@@ -15,10 +15,10 @@ private:
   static DWORD WINAPI ThreadProc( LPVOID Param );
 
   void Poll();
-  void ProcessEntries();
+  void ProcessEntries( std::size_t Count );
   void OnSuspiciousPc( const PcInfo& Info, std::uintptr_t Va, std::uintptr_t Tid );
 
   ModuleChecker& Checker;
   SafeHandle Thread;
-  bool Running = false;
+  std::atomic<bool> Running = false;
 };

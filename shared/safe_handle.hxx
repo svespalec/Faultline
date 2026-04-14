@@ -7,7 +7,7 @@ struct SafeHandle {
   SafeHandle( HANDLE Handle ) : Handle( Handle ) {}
 
   ~SafeHandle() {
-    if ( Handle ) {
+    if ( Handle && Handle != INVALID_HANDLE_VALUE ) {
       CloseHandle( Handle );
     }
   }
@@ -20,6 +20,6 @@ struct SafeHandle {
   }
 
   explicit operator bool() const {
-    return Handle != nullptr;
+    return Handle != nullptr && Handle != INVALID_HANDLE_VALUE;
   }
 };

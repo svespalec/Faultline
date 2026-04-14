@@ -6,6 +6,7 @@
 #include <windows.h>
 
 #include <algorithm>
+#include <atomic>
 #include <iostream>
 #include <memory>
 #include <print>
