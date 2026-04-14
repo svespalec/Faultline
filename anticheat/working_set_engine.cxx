@@ -122,41 +122,42 @@ void WorkingSetEngine::ProcessEntries( std::size_t Count ) {
     auto Info = Checker.Classify( Pc );
 
     if ( Info.Suspicious() ) {
-      OnSuspiciousPc( Info, Va, static_cast<std::uintptr_t>( Entry.FaultingThreadId ) );
+      OnSuspiciousPc( Info, static_cast<std::uintptr_t>( Entry.FaultingThreadId ) );
     }
   }
 }
 
 void WorkingSetEngine::OnSuspiciousPc(
   const PcInfo& Info,
-  std::uintptr_t Va,
   std::uintptr_t Tid
 ) {
-  LOG_ERROR( "Suspicious execution @ pc {:#018x}", Info.Pc );
-  LOG_INFO( "  Va: {:#018x}", Va );
-  LOG_INFO( "  TID: {}", Tid );
-  LOG_INFO( "  Region: [{:#018x} - {:#018x}]", Info.RegionBase, Info.RegionEnd );
-  LOG_INFO( "  Alloc base: {:#018x}", Info.AllocationBase );
-  LOG_INFO( "  Type: {}", Info.AllocationTypeName() );
-  LOG_INFO( "  Protection: {} ({:#010x})", ProtectionName( Info.Protection ), Info.Protection );
-  LOG_INFO( "  Known module: {}", Info.WithinKnownModule ? "Yes" : "No" );
+  LOG_INFO( "----------------------- Detection ----------------------" );
+  LOG_ERROR( "Suspicious execution @ PC {:#018x}", Info.Pc );
+  LOG_INFO( "TID: {}", Tid );
+  LOG_INFO( "Region: [{:#018x} - {:#018x}]", Info.RegionBase, Info.RegionEnd );
+  LOG_INFO( "Alloc base: {:#018x}", Info.AllocationBase );
+  LOG_INFO( "Type: {}", Info.AllocationTypeName() );
+  LOG_INFO( "Protection: {} ({:#010x})", ProtectionName( Info.Protection ), Info.Protection );
 
   auto Frames = CaptureStack( Tid, Checker );
 
   if ( Frames.empty() ) {
-    LOG_INFO( "  Stack walk: failed or thread already exited" );
+    LOG_INFO( "Stack: failed or thread already exited" );
+    LOG_INFO( "-------------------------------------------------------" );
     return;
   }
 
-  LOG_INFO( "  Stack trace ({} frames):", Frames.size() );
+  LOG_INFO( "Stack ({} frames):", Frames.size() );
 
   for ( std::size_t I = 0; I < Frames.size(); ++I ) {
     const auto& F = Frames[ I ];
     auto Label = F.ModuleName.empty() ? "???" : F.ModuleName;
 
-    LOG_INFO( "    [{}] {:#018x} [{}]{}",
+    LOG_INFO( "  [{}] {:#018x} [{}]{}",
       I, F.Pc, Label,
       F.WithinKnownModule ? "" : " <-- OUTSIDE KNOWN MODULE"
     );
   }
+
+  LOG_INFO( "-------------------------------------------------------" );
 }

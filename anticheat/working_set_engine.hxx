@@ -16,7 +16,7 @@ private:
 
   void Poll();
   void ProcessEntries( std::size_t Count );
-  void OnSuspiciousPc( const PcInfo& Info, std::uintptr_t Va, std::uintptr_t Tid );
+  void OnSuspiciousPc( const PcInfo& Info, std::uintptr_t Tid );
 
   ModuleChecker& Checker;
   SafeHandle Thread;
