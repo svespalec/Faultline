@@ -10,6 +10,37 @@ Faultline polls these events, checks whether each `FaultingPc` falls within a kn
 
 This catches code that was injected via manual mapping, shellcode injection, or similar techniques where the executable memory is never registered with the Windows loader.
 
+```mermaid
+flowchart LR
+  subgraph Attacker["Attacker (external process)"]
+    A1[Manual map DLL]
+    A2[Write shellcode]
+    A3[SetThreadContext]
+    A4[APC injection]
+  end
+
+  subgraph Target["Target process"]
+    B[Execution from\nunregistered memory]
+    C[Page fault]
+    D[OS records FaultingPc\nin working set buffer]
+  end
+
+  subgraph Faultline
+    E[Poll GetWsChangesEx]
+    F{FaultingPc in\nknown module?}
+    G[Suspend thread\n+ stack walk]
+    H[Flagged]
+  end
+
+  A1 --> B
+  A2 --> B
+  A3 --> B
+  A4 --> B
+  B --> C --> D --> E --> F
+  F -- No --> G --> H
+  F -- Yes --> I[Ignore]
+```
+
 ## Thread hijacking detection from usermode
 
 This is where it gets interesting. If an external process hijacks a thread inside the host via `SetThreadContext` / `NtSetContextThread`, APC injection, or similar techniques and redirects execution into injected memory, the page fault still fires. The `FaultingPc` still resolves to memory outside any known module, and faultline catches it.
@@ -31,6 +62,13 @@ There isn't really a clean way to detect thread hijacking today. There's no kern
 1. Start `host.exe`
 2. Run `injector.exe` in a separate terminal
 3. The host console will log any detected suspicious execution along with stack traces
+
+The injector supports two modes:
+
+- **Remote thread** (default): `injector.exe` creates a new thread in the host via `CreateRemoteThread`
+- **Thread hijack**: `injector.exe --hijack` redirects an existing host thread via `SetThreadContext`
+
+Both trigger detection, but the host runs a background game loop thread that serves as the hijack target
 
 ## Demo
 
