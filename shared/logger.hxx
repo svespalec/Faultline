@@ -4,6 +4,7 @@ enum class LogLevel {
   Success,
   Step,
   Info,
+  Warn,
   Error,
 };
 
@@ -13,6 +14,7 @@ namespace Detail {
       case LogLevel::Success: return FOREGROUND_GREEN | FOREGROUND_INTENSITY;
       case LogLevel::Step:    return FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
       case LogLevel::Info:    return FOREGROUND_BLUE | FOREGROUND_INTENSITY;
+      case LogLevel::Warn:    return FOREGROUND_RED | FOREGROUND_GREEN;
       case LogLevel::Error:   return FOREGROUND_RED | FOREGROUND_INTENSITY;
       default:                return FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
     }
@@ -23,6 +25,7 @@ namespace Detail {
       case LogLevel::Success: return "[+]";
       case LogLevel::Step:    return "[*]";
       case LogLevel::Info:    return "[~]";
+      case LogLevel::Warn:    return "[!]";
       case LogLevel::Error:   return "[-]";
       default:                return "[?]";
     }
@@ -79,4 +82,5 @@ namespace Detail {
 #define LOG_OK( ... )    ::Detail::Log( LogLevel::Success, __VA_ARGS__ )
 #define LOG_STEP( ... )  ::Detail::Log( LogLevel::Step, __VA_ARGS__ )
 #define LOG_INFO( ... )  ::Detail::Log( LogLevel::Info, __VA_ARGS__ )
+#define LOG_WARN( ... )  ::Detail::Log( LogLevel::Warn, __VA_ARGS__ )
 #define LOG_ERROR( ... ) ::Detail::Log( LogLevel::Error, __VA_ARGS__ )

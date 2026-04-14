@@ -23,7 +23,7 @@ extern "C" __declspec( dllexport ) DWORD WINAPI PayloadRun( LPVOID ) {
     VirtualFree( Page, 0, MEM_RELEASE );
   }
 
-  LOG_STEP( "Payload executing from manually-mapped memory" );
+  LOG_WARN( "Payload executing from manually-mapped memory" );
 
   //
   // Stay alive long enough for the WS monitor to poll and stackwalk this thread

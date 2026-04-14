@@ -127,7 +127,7 @@ void WorkingSetEngine::OnSuspiciousPc(
   LOG_ERROR( "Suspicious execution @ pc {:#018x}", Info.Pc );
   LOG_INFO( "  Va: {:#018x}", Va );
   LOG_INFO( "  TID: {}", Tid );
-  LOG_INFO( "  Region: [{:#018x} .. {:#018x})", Info.RegionBase, Info.RegionEnd );
+  LOG_INFO( "  Region: [{:#018x} - {:#018x}]", Info.RegionBase, Info.RegionEnd );
   LOG_INFO( "  Alloc base: {:#018x}", Info.AllocationBase );
   LOG_INFO( "  Type: {}", Info.AllocationTypeName() );
   LOG_INFO( "  Protection: {} ({:#010x})", ProtectionName( Info.Protection ), Info.Protection );
