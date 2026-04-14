@@ -8,7 +8,13 @@ Windows tracks page faults per process through the working set watch API (`Initi
 
 Faultline polls these events, checks whether each `FaultingPc` falls within a known loaded module, and flags execution from memory regions that are executable but not backed by any module in the PEB. When a suspicious fault is detected, the faulting thread is suspended and its stack is walked to capture the full call chain.
 
-This catches code that was injected via manual mapping, `VirtualAllocEx` + `WriteProcessMemory`, or similar techniques where the executable memory is never registered with the Windows loader.
+This catches code that was injected via manual mapping, shellcode injection, or similar techniques where the executable memory is never registered with the Windows loader.
+
+## Thread hijacking detection from usermode
+
+This is where it gets interesting. If an external process hijacks a thread inside the host via `SetThreadContext` / `NtSetContextThread`, APC injection, or similar techniques and redirects execution into injected memory, the page fault still fires. The `FaultingPc` still resolves to memory outside any known module, and faultline catches it.
+
+There isn't really a clean way to detect thread hijacking today. There's no kernel callback for context changes, and while ETW can trace the relevant syscalls, that's indirect at best. Faultline sidesteps the problem entirely by observing the side effects of execution rather than trying to intercept the redirection itself. It doesn't matter how the thread got there or who pointed it there. If it executes from unregistered memory and faults a page, it's visible.
 
 ## Components
 
@@ -18,7 +24,7 @@ This catches code that was injected via manual mapping, `VirtualAllocEx` + `Writ
 | `host/`    | Minimal target process that loads the detection DLL |
 | `injector/`| Manual mapper that injects the test payload into the host process |
 | `payload/` | Test DLL that executes from manually mapped memory to trigger detection |
-| `shared/`   | Common headers (logger, RAII handles, utilities)
+| `shared/`  | Common headers (logger, RAII handles, utilities) |
 
 ## Usage
 
