@@ -1,6 +1,6 @@
 # Faultline
 
-An anticheat proof of concept that detects execution from manually mapped memory by monitoring working set page faults and walking the call stack of suspicious threads.
+An anticheat/antimalware proof of concept that detects execution from manually mapped memory by monitoring working set page faults and walking the call stack of suspicious threads.
 
 ## How it works
 
